@@ -1,0 +1,97 @@
+export type MenuDish = { img: string; name: string; sub: string; price: string; desc?: string; tag?: string; todo?: boolean };
+export type MenuCat = { layout: "big4" | "flat3"; id: string; num: string; title: string; tagline: string; w: [string, string, string]; dishes: MenuDish[] };
+
+// Alle Preise sind Platzhalter (Demo)
+export const MENU_CATS: MenuCat[] = [
+  {
+    layout: "big4", id: "eis", num: "01", title: "Eiskreationen", tagline: "Eis wie ein Kunstwerk.",
+    w: ["#ffc2d8", "#e0659b", "#7d1a4c"],
+    dishes: [
+      { img: "f1", name: "Coupe Royal", sub: "Pistazie · Himbeere · Blattgold · Blüten", price: "12,90 €", desc: "Pistazie, Vanille und Himbeersorbet im Kelch geschichtet, dazu Karamellsauce, frische Himbeeren, Schokosplitter, essbare Blüten und echtes Blattgold. Jeder Löffel schmeckt anders.", tag: "Signature" },
+      { img: "f2", name: "Waffel-Traum", sub: "Erdbeereis · Macarons · Sahnewolke", price: "11,50 €", desc: "Eine knusprige Waffelschale mit drei Kugeln Erdbeere, Vanille und Himbeere, bunten Macarons, frischen Erdbeeren, Beerensauce und einer hohen Sahnehaube." },
+      { img: "eis", name: "Die Eis-Bowl", sub: "drei Kugeln · Waffel-Krokant · Beeren", price: "8,90 €", desc: "Drei Kugeln nach Wahl in der Schale, dazu Waffel-Krokant, frische Erdbeeren, Streusel und Sahne. Unser Klassiker, allein oder zum Teilen." },
+      { img: "f3", name: "Schoko-Pistazie", sub: "dunkle Schokolade · Pistazie · Salz", price: "6,90 €", desc: "Ein Waffelhörnchen, in dunkle Schokolade getaucht und mit gehackten Pistazien bestreut, gefüllt mit Pistazien- und Erdbeereis. Zum Schluss eine Prise Meersalz." },
+      { img: "f6", name: "Banana Split", sub: "drei Kugeln · Karamellbanane · Waffel", price: "10,90 €", desc: "Eine halbe Banane, karamellisiert, mit Schoko-, Vanille- und Erdbeereis, Sahnehaube, Kirschen, Waffelröllchen und warmer Schokosauce." },
+      { img: "f8", name: "Cookie-Sandwich", sub: "Vanilleeis zwischen Cookies · Streusel", price: "6,50 €", desc: "Zwei große, innen noch weiche Schoko-Cookies mit einer dicken Schicht Vanilleeis, Regenbogen-Streuseln und Sahnetupfern." },
+      { img: "f9", name: "Eistorte", sub: "Beeren · Biskuit · Sahne", price: "7,90 €", desc: "Ein Stück Eistorte mit Biskuitboden, Erdbeer-Creme, Vanilleschicht und Beerenspiegel, mit frischen Erdbeeren und Minze. Auf Wunsch mit Wunderkerze." },
+      { img: "e1", name: "Regenbogen-Waffelbowl", sub: "sechs Kugeln · Zuckerfunken · Gold", price: "13,90 €", todo: true },
+      { img: "e2", name: "Jar-Cake", sub: "Vanille · Erdbeere · Oreo · Wunderkerze", price: "9,50 €", todo: true },
+      { img: "e3", name: "Macaron-Trio", sub: "Rosa · Pistazie · Zitrone · Himbeere", price: "8,50 €", desc: "Drei hausgemachte Macarons in Himbeere, Pistazie und Zitrone, gefüllt mit Buttercreme und einem Kern aus Fruchtkonfitüre." },
+      { img: "e4", name: "Shortcake-Becher", sub: "Erdbeere · Kuchenkrümel · Sahne", price: "9,90 €", desc: "Geschichtet im Becher: Erdbeereis, Sahne, Beeren und Kuchenkrümel, gekrönt mit einem Sahnetuff, frischen Erdbeeren und Minze." },
+      { img: "f10", name: "Mango-Parfait", sub: "Mango · Passionsfrucht · Joghurt · Pistazie", price: "8,90 €", desc: "Hohes Glas mit Schichten aus Mango, Passionsfrucht und Joghurt-Eis, mit gehackten Pistazien und einer essbaren Blüte. Fruchtig, frisch, leicht." },
+      { img: "sundae", name: "Drei Kugeln im Schälchen", sub: "Pistazie · Erdbeere · Vanille · Waffelfächer", price: "7,50 €", desc: "Drei Kugeln im Porzellanschälchen, dazu ein Waffelfächer, frische Erdbeeren und ein Tupfer Sahne mit Streuseln." },
+      { img: "cone", name: "Das Hörnchen", sub: "zwei Kugeln nach Wahl · Streusel · Kirsche", price: "5,20 €", desc: "Das klassische Waffelhörnchen, frisch gerollt: eine Kugel Pistazie, eine Kugel Erdbeere, bunte Streusel und eine Kirsche obendrauf." },
+    ],
+  },
+  {
+    layout: "flat3", id: "shake", num: "02", title: "Milchshakes", tagline: "Dicht. Kalt. Schokoladig.",
+    w: ["#f3dcc6", "#b9784f", "#43200f"],
+    dishes: [
+      { img: "f7", name: "Donut-Freakshake", sub: "Glasierter Donut · Macarons · Schoko-Drip", price: "9,90 €", desc: "Ein Schoko-Shake mit Schoko-Drip am Glasrand, darauf ein glasierter Donut, bunte Macarons, Sahne und Streusel. Mit Strohhalm und Löffel.", tag: "Signature" },
+      { img: "s2", name: "Cookies & Cream", sub: "Keks-Rand · Sahneturm · Cookie-Sandwich", price: "8,90 €", desc: "Vanille-Shake mit zerbröselten Keksen, Keks-Rand, einem Sahneturm, Cookie-Sandwich obendrauf und Schokosauce." },
+      { img: "s3", name: "Salted Caramel Pop", sub: "Popcorn · Brezel · Karamell-Drip", price: "8,90 €", desc: "Salzkaramell-Shake mit Karamell-Drip, Sahne, Karamell-Popcorn und einer Brezel. Süß, salzig, knusprig." },
+      { img: "s4", name: "Cheesecake-Shake", sub: "Erdbeere · Graham-Rand · Cheesecake", price: "8,50 €", desc: "Frischkäse-Shake mit Erdbeeren und Graham-Cracker-Rand, gekrönt von Erdbeercreme und einem Stück Cheesecake." },
+      { img: "s5", name: "Pistazie & Schoko", sub: "Cannoli · Goldstrohhalm", price: "9,20 €", desc: "Pistazien-Shake mit dunkler Schokolade, einem Cannolo, gehackten Pistazien und einem goldenen Strohhalm." },
+      { img: "s1", name: "Einhorn-Shake", sub: "Zuckerwatte · Lolli · Glitzer", price: "9,90 €", desc: "Pastellfarbener Shake mit Zuckerwatte, Regenbogen-Lolli, Einhorn-Horn und -Ohren aus Fondant, Streuseln und Glitzer." },
+      { img: "s6", name: "Brownie-Mocha", sub: "ganzer Brownie · Schoko-Drip", price: "9,50 €", desc: "Mokka-Shake mit einem warmen Brownie, Schokodrip, Sahne, Schokosplittern und einer Schokotafel." },
+      { img: "s7", name: "Drachenfrucht-Shake", sub: "Erdbeere · essbare Blüten", price: "8,90 €", desc: "Pinker Pitaya-Erdbeer-Shake im Einmachglas, mit frischen Erdbeeren, essbaren Blüten und Sahne." },
+      { img: "shake", name: "Schoko-Cookie", sub: "Vollmilch · Schoko-Eis · Cookie-Stücke", price: "6,90 €", desc: "Cremiger Vollmilch-Shake mit Schoko-Eis, Sahne, Schoko-Raspeln und Cookie-Stücken. Der Klassiker." },
+      { img: "s8", name: "Cookie-Monster", sub: "Keksteig · Karamell-Drip · Cookies", price: "9,50 €", desc: "Blauer Vanille-Shake mit Keksteig-Stücken, Karamell-Drip, einem Turm aus Cookies, Sahne und bunten Streuseln." },
+    ],
+  },
+  {
+    layout: "flat3", id: "acai", num: "03", title: "Açaí-Bowls", tagline: "Dick. Dunkel. Tropisch.",
+    w: ["#dcc6f4", "#8452c9", "#26103f"],
+    dishes: [
+      { img: "a1", name: "Ananas-Bowl", sub: "in der Frucht serviert · Drachenfrucht · Honig", price: "12,90 €", desc: "In einer halben Ananas serviert: Açaí-Püree, Drachenfrucht, Banane, Granola, Chia und Blüten, mit Honig verfeinert.", tag: "Signature" },
+      { img: "f4", name: "Pitaya-Bowl", sub: "Orchideen · Kokoschips · Granola", price: "11,50 €", desc: "Pinke Pitaya-Basis mit Orchideen, Kokoschips, Granola, Kiwi, Banane und Beeren." },
+      { img: "a4", name: "Kokosnuss-Bowl", sub: "Feige · Granatapfel · Pistazie", price: "11,90 €", desc: "In der Kokosnussschale: Açaí mit frischen Feigen, Granatapfelkernen, Himbeeren und Pistazien, dazu eine Orchidee." },
+      { img: "a5", name: "Bananenboot", sub: "Açaí · Honig · Granola", price: "10,90 €", desc: "Eine ganze Banane als Boot, darin Açaí-Kugeln, Beeren, Granola, Minze und ein Faden Honig." },
+      { img: "a6", name: "Sternfrucht-Bowl", sub: "Goji · Blüten · Kokoschips", price: "11,50 €", desc: "Açaí mit Pitaya-Wirbel, Sternfrucht, Blaubeeren, Gojibeeren, Kokoschips und essbaren Stiefmütterchen." },
+      { img: "a7", name: "Herz-Bowl", sub: "Beerenherz · Mandelmus", price: "10,50 €", desc: "Açaí-Bowl mit Erdbeer-Herz, Himbeeren, Minze, Granola und Mandelmus." },
+      { img: "a2", name: "Regenbogen-Bowl", sub: "Früchte gelegt, nicht gestreut", price: "10,90 €", desc: "Früchte in Reihen gelegt statt gestreut: Banane, Erdbeere, Kiwi, Blaubeeren, Mango, Granola und Chia auf Açaí." },
+      { img: "a3", name: "Erdnuss & Kakao", sub: "Erdnussbutter · Kakao-Nibs · Banane", price: "10,50 €", desc: "Açaí-Kakao-Basis mit Erdnussbutter-Spirale, Banane, Kakao-Nibs, Mandeln und Kokos." },
+      { img: "acai", name: "Klassik-Bowl", sub: "Beeren · Granola · Kokos", price: "9,50 €", desc: "Açaí mit Banane, Erdbeeren, Blaubeeren, Kiwi, Granola und Kokosflocken. Unsere Basis, so wie sie sein soll." },
+    ],
+  },
+  {
+    layout: "flat3", id: "coffee", num: "04", title: "Iced Coffee", tagline: "Karamell trifft Crunch.",
+    w: ["#f4d8a4", "#c98238", "#42250c"],
+    dishes: [
+      { img: "f5", name: "Affogato Royal", sub: "Vanilleeis · Espresso · Gold", price: "7,90 €", desc: "Eine Kugel Vanilleeis im Glas, mit doppeltem Espresso übergossen, dazu Schoko-Splitter, Blattgold und ein Waffelfächer.", tag: "Signature" },
+      { img: "c4", name: "Coffee Float", sub: "Cold Brew · Vanilleeis · Wafer", price: "7,20 €", desc: "Cold Brew mit Vanilleeis, Sahne, Karamell und Waffelröllchen im hohen Glas." },
+      { img: "c5", name: "Vanilla Cold Foam", sub: "Karamell · Biscotti", price: "6,20 €", desc: "Cold Brew mit Vanille-Kaltschaum, Karamell-Gitter und einem Biscotti zum Tunken." },
+      { img: "c6", name: "Coffee-Eis-Latte", sub: "Kaffee-Eis · Kakao · Bohnen", price: "6,90 €", desc: "Eiskalter Milchkaffee mit Kaffee-Eis, Sahne, Kakao und Kaffeebohnen." },
+      { img: "c7", name: "Matcha & Espresso", sub: "Eiswürfel · Sahnewirbel", price: "6,50 €", desc: "Matcha-Latte mit Espresso-Schicht, Eiswürfeln, Sahnewirbel und Matcha-Staub." },
+      { img: "c2", name: "Tiramisu Cold Brew", sub: "Mascarpone · Kakao · Löffelbiskuit", price: "6,50 €", desc: "Cold Brew mit Mascarpone-Creme, Kakao und Löffelbiskuit. Wie Tiramisu zum Trinken." },
+      { img: "c3", name: "Mocha Frappé", sub: "Schokolade · Sahne · Späne", price: "6,20 €", desc: "Gefrorener Mokka mit Schokolade, Sahne und Schokosplittern." },
+      { img: "c1", name: "Caramel Macchiato", sub: "Keks-Rand · Karamell · Sahnewolke", price: "5,90 €", desc: "Milch, Espresso und Karamell mit Keks-Rand und einer Sahnewolke." },
+      { img: "coffee", name: "Karamell-Crunch", sub: "Doppelter Espresso · Cookie-Crumbles", price: "5,50 €", desc: "Doppelter Espresso, Milch, Karamell und Eiswürfel, mit Cookie-Crumbles bestreut." },
+      { img: "c8", name: "Zimt Cold Brew", sub: "Karamell · Zimtschaum · Eiswürfel", price: "6,40 €", desc: "Cold Brew über Eiswürfeln mit Karamell-Drip, einer Haube aus Zimtschaum und einer Zimtstange." },
+    ],
+  },
+  {
+    layout: "flat3", id: "waffel", num: "05", title: "Waffeln & Süßes", tagline: "Warm, knusprig, mit Eis obendrauf.",
+    w: ["#fde3b0", "#e0a047", "#6a3a0c"],
+    dishes: [
+      { img: "d7", name: "Belgische Waffel", sub: "Vanilleeis · Beeren · Schokosauce", price: "9,50 €", tag: "Signature", desc: "Frisch gebacken, außen knusprig, innen luftig, mit einer Kugel Vanilleeis, Erdbeeren, Blaubeeren, Puderzucker und Schokosauce." },
+      { img: "d8", name: "Crêpe Banane-Schoko", sub: "Haselnusscreme · Sahne · Haselnuss", price: "8,50 €", desc: "Ein gefalteter Crêpe, gefüllt mit Bananenscheiben und Haselnuss-Schokocreme, mit Sahne, Schokofäden und gehackten Haselnüssen." },
+      { img: "d9", name: "Pancake-Turm", sub: "Ahornsirup · Beeren · Butter", price: "10,50 €", desc: "Ein hoher Turm fluffiger Pancakes mit einem Stück Butter, Himbeeren, Blaubeeren, Puderzucker und warmem Ahornsirup." },
+      { img: "d10", name: "Spaghettieis", sub: "Vanille · Erdbeersauce · weiße Schokolade", price: "8,90 €", desc: "Vanilleeis, als Spaghetti gepresst, mit Erdbeersauce und geraspelter weißer Schokolade. Sieht aus wie Pasta, schmeckt nach Sommer." },
+      { img: "d11", name: "Fruchtbecher", sub: "Mango · Erdbeere · Waffel", price: "9,90 €", desc: "Hohes Glas mit Mango- und Erdbeereis, frischem Obst, Sahne und einem Waffelplättchen, gekrönt von einem Erdbeer-Fächer." },
+    ],
+  },
+  {
+    layout: "flat3", id: "drinks", num: "06", title: "Getränke", tagline: "Kaffee, Kakao, Frisches.",
+    w: ["#ead6c2", "#9b6a4a", "#2f170a"],
+    dishes: [
+      { img: "d1", name: "Cappuccino", sub: "Espresso · Milchschaum · Latte Art", price: "3,90 €", tag: "Signature", desc: "Doppelter Espresso, mit samtigem Milchschaum aufgegossen und mit Latte Art verziert. Aus Bohnen der Hausrösterei." },
+      { img: "d2", name: "Latte Macchiato", sub: "Milch · Espresso · Kakao", price: "4,50 €", desc: "Drei Schichten im hohen Glas: warme Milch, Espresso und eine Haube aus Milchschaum mit Kakao." },
+      { img: "d3", name: "Heiße Schokolade", sub: "Sahne · Marshmallows · Zimt", price: "4,90 €", desc: "Dunkle Schokolade, in Vollmilch geschmolzen, mit Sahnehaube, Marshmallows, Schokoraspeln und einer Zimtstange." },
+      { img: "d4", name: "Espresso doppio", sub: "doppelt · Biscotti · Würfelzucker", price: "3,20 €", desc: "Ein doppelter Espresso mit goldener Crema, dazu ein Mandel-Biscotti und ein Stück Zucker." },
+      { img: "d12", name: "Chai Latte", sub: "Gewürztee · Milchschaum · Zimt", price: "4,50 €", desc: "Würziger Chai mit Zimt, Kardamom und Ingwer, mit warmer Milch und einer Haube aus Milchschaum, mit Sternanis serviert." },
+      { img: "d5", name: "Zitronen-Limonade", sub: "Zitrone · Minze · Eiswürfel", price: "4,20 €", desc: "Frisch gepresste Zitronen, Minze und Eiswürfel, hausgemacht und nur leicht gesüßt." },
+      { img: "d6", name: "Pfirsich-Eistee", sub: "Pfirsich · Minze · Eiswürfel", price: "4,20 €", desc: "Kalt gezogener Schwarztee mit Pfirsichscheiben, Minze und Eiswürfeln." },
+    ],
+  },
+];
