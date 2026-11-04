@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Karten-Varianten</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Bodoni Moda","Didot","Playfair Display",Georgia,serif;background:#111;color:#fbeee4}
+.v{position:relative;height:900px;width:1440px;overflow:hidden}
+.tag{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:20;font:600 11px/1 system-ui;letter-spacing:.3em;text-transform:uppercase;background:#fbeee4;color:#2a0a1d;padding:8px 14px;border-radius:99px}
+img{display:block}
+/* A · Editorial: Zeilen mit Punktlinie, Bild links sticky */
+.A{background:#f6ead9;color:#3a0f29}
+.A .head{position:absolute;left:80px;top:70px}
+.A .head p{font:500 12px system-ui;letter-spacing:.4em;text-transform:uppercase;opacity:.6}
+.A .head h2{font-size:84px;font-weight:500;line-height:1;margin-top:10px}
+.A .head h2 em{color:#c2457a}
+.A .hero{position:absolute;left:80px;top:290px;width:480px;height:560px;border-radius:260px 260px 24px 24px;background:linear-gradient(#ffc2d8,#e0659b);overflow:hidden}
+.A .hero img{position:absolute;left:50%;bottom:-6%;width:92%;transform:translateX(-50%);filter:drop-shadow(0 30px 30px rgba(80,10,50,.4))}
+.A ul{position:absolute;left:640px;right:80px;top:120px;list-style:none}
+.A li{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:22px 0;border-bottom:1px solid rgba(58,15,41,.2)}
+.A li h3{font-size:34px;font-weight:500;font-style:italic}
+.A li p{grid-column:1;font:400 14px system-ui;letter-spacing:.04em;opacity:.65;margin-top:6px}
+.A li b{font-size:28px;font-weight:500;grid-row:1;grid-column:2}
+.A li.on h3{color:#c2457a}
+.A li small{font:600 10px system-ui;letter-spacing:.24em;text-transform:uppercase;background:#3a0f29;color:#fbeee4;padding:4px 9px;border-radius:99px;margin-left:12px;vertical-align:middle}
+.A .nav{position:absolute;right:80px;top:60px;display:flex;gap:18px;font:600 12px system-ui;letter-spacing:.2em;text-transform:uppercase}
+.A .nav span{padding:9px 16px;border-radius:99px;border:1px solid rgba(58,15,41,.3)}
+.A .nav span.on{background:#3a0f29;color:#fbeee4}
+/* B · Poster-Collage: Vollfläche, Gerichte schweben, Preis-Sticker */
+.B{background:radial-gradient(ellipse at 50% 40%,#ff9cc4,#c2457a 55%,#5a1740)}
+.B .big{position:absolute;left:0;right:0;top:40px;text-align:center;font-size:300px;line-height:1;font-weight:500;font-style:italic;color:rgba(255,255,255,.14);letter-spacing:-.03em}
+.B .d{position:absolute;filter:drop-shadow(0 40px 36px rgba(60,0,30,.5))}
+.B .d img{width:100%}
+.B .st{position:absolute;background:#fbeee4;color:#5a1740;border-radius:50%;width:104px;height:104px;display:grid;place-items:center;text-align:center;font-size:22px;font-weight:600;transform:rotate(-10deg);box-shadow:0 12px 28px rgba(0,0,0,.3)}
+.B .st small{display:block;font:600 9px system-ui;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+.B .cap{position:absolute;font-size:30px;font-style:italic}
+.B .cap small{display:block;font:400 13px system-ui;letter-spacing:.06em;opacity:.8;margin-top:4px;max-width:240px}
+.B .top{position:absolute;left:60px;top:56px;font:600 12px system-ui;letter-spacing:.4em;text-transform:uppercase}
+.B .top b{display:block;font-size:56px;font-weight:500;letter-spacing:0;text-transform:none;font-family:inherit;margin-top:8px}
+.B .dots{position:absolute;right:60px;top:60px;display:flex;gap:10px}
+.B .dots i{width:11px;height:11px;border-radius:50%;border:1.5px solid #fbeee4}
+.B .dots i.on{background:#fbeee4}
+/* C · Bühne: ein Gericht groß, Index rechts */
+.C{background:#1a0612}
+.C .glow{position:absolute;left:-10%;top:10%;width:70%;height:90%;background:radial-gradient(circle,#e0659b88,transparent 65%)}
+.C .stage{position:absolute;left:40px;top:60px;width:760px;height:800px}
+.C .stage img{position:absolute;left:50%;top:50%;height:760px;transform:translate(-50%,-50%) rotate(-4deg);filter:drop-shadow(0 50px 50px rgba(0,0,0,.6))}
+.C .ring{position:absolute;left:50%;top:50%;width:620px;height:620px;border-radius:50%;border:1px solid rgba(251,238,228,.18);transform:translate(-50%,-50%)}
+.C .info{position:absolute;left:860px;top:150px;width:500px}
+.C .info p.k{font:500 12px system-ui;letter-spacing:.4em;text-transform:uppercase;color:#f4c4d4}
+.C .info h2{font-size:78px;font-weight:500;line-height:1.02;margin:14px 0}
+.C .info .d{font:400 15px/1.6 system-ui;opacity:.75}
+.C .info .pr{display:flex;align-items:center;gap:24px;margin-top:28px}
+.C .info .pr b{font-size:44px;font-weight:500}
+.C .info .pr span{font:600 11px system-ui;letter-spacing:.24em;text-transform:uppercase;border:1px solid rgba(251,238,228,.6);padding:12px 20px;border-radius:99px}
+.C .idx{position:absolute;left:860px;bottom:70px;width:500px;display:flex;gap:12px}
+.C .idx div{width:84px;height:84px;border-radius:18px;background:linear-gradient(#ffc2d8,#7d1a4c);overflow:hidden;position:relative;opacity:.5}
+.C .idx div.on{opacity:1;outline:2px solid #fbeee4;outline-offset:3px}
+.C .idx img{position:absolute;left:50%;bottom:-8%;width:130%;transform:translateX(-50%)}
+.C .cat{position:absolute;left:860px;top:70px;display:flex;gap:14px;font:600 11px system-ui;letter-spacing:.2em;text-transform:uppercase}
+.C .cat span{opacity:.5}
+.C .cat span.on{opacity:1;border-bottom:1px solid #fbeee4;padding-bottom:4px}
+.C .n{position:absolute;left:60px;bottom:50px;font-size:140px;font-style:italic;color:transparent;-webkit-text-stroke:1px rgba(251,238,228,.4);line-height:1}
+</style></head><body>
+
+<section class="v A" id="A">
+  <div class="tag">Variante A · Editorial-Karte</div>
+  <div class="head"><p>01 · Eiskreationen</p><h2>Eis wie ein <em>Kunstwerk.</em></h2></div>
+  <div class="nav"><span class="on">Eis</span><span>Shakes</span><span>Açaí</span><span>Coffee</span></div>
+  <div class="hero"><img src="/menu/f1.png" alt=""></div>
+  <ul>
+    <li class="on"><h3>Coupe Royal<small>Signature</small></h3><b>12,90 €</b><p>Pistazie · Himbeere · Blattgold · Blüten</p></li>
+    <li><h3>Waffel-Traum</h3><b>11,50 €</b><p>Erdbeereis · Macarons · Sahnewolke</p></li>
+    <li><h3>Banana Split</h3><b>10,90 €</b><p>drei Kugeln · Karamellbanane · Waffel</p></li>
+    <li><h3>Die Eis-Bowl</h3><b>8,90 €</b><p>drei Kugeln · Waffel-Krokant · Beeren</p></li>
+    <li><h3>Eistorte</h3><b>7,90 €</b><p>Beeren · Biskuit · Sahne</p></li>
+    <li><h3>Schoko-Pistazie</h3><b>6,90 €</b><p>dunkle Schokolade · Pistazie · Salz</p></li>
+    <li><h3>Cookie-Sandwich</h3><b>6,50 €</b><p>Vanilleeis zwischen Cookies · Streusel</p></li>
+  </ul>
+</section>
+
+<section class="v B" id="B">
+  <div class="tag">Variante B · Poster-Collage</div>
+  <div class="big">EIS</div>
+  <div class="top">01 / 04<b>Eiskreationen</b></div>
+  <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+  <div class="d" style="left:90px;top:300px;width:380px"><img src="/menu/f2.png" alt=""></div>
+  <div class="d" style="left:480px;top:170px;width:470px;z-index:3"><img src="/menu/f1.png" alt=""></div>
+  <div class="d" style="left:960px;top:330px;width:400px"><img src="/menu/eis.png" alt=""></div>
+  <div class="d" style="left:640px;top:560px;width:330px;z-index:4"><img src="/menu/f8.png" alt=""></div>
+  <div class="st" style="left:420px;top:290px"><div><small>Waffel-Traum</small>11,50</div></div>
+  <div class="st" style="left:880px;top:200px;z-index:6"><div><small>Coupe Royal</small>12,90</div></div>
+  <div class="st" style="left:1250px;top:300px"><div><small>Eis-Bowl</small>8,90</div></div>
+  <div class="st" style="left:930px;top:640px;z-index:6"><div><small>Cookie</small>6,50</div></div>
+  <div class="cap" style="left:90px;top:760px">Waffel-Traum<small>Erdbeereis · Macarons · Sahnewolke</small></div>
+</section>
+
+<section class="v C" id="C">
+  <div class="tag">Variante C · Bühne</div>
+  <div class="glow"></div>
+  <div class="stage"><div class="ring"></div><img src="/menu/f1.png" alt=""></div>
+  <div class="n">01</div>
+  <div class="cat"><span class="on">Eiskreationen</span><span>Milchshakes</span><span>Açaí-Bowls</span><span>Iced Coffee</span></div>
+  <div class="info">
+    <p class="k">Signature</p>
+    <h2>Coupe Royal</h2>
+    <p class="d">Pistazie, Himbeere, Blattgold und essbare Blüten. Die Eiskreation, mit der wir angefangen haben, und die, die jeder fotografiert.</p>
+    <div class="pr"><b>12,90 €</b><span>Zum nächsten →</span></div>
+  </div>
+  <div class="idx">
+    <div class="on"><img src="/menu/f1.png" alt=""></div>
+    <div><img src="/menu/f2.png" alt=""></div>
+    <div><img src="/menu/eis.png" alt=""></div>
+    <div><img src="/menu/f3.png" alt=""></div>
+    <div><img src="/menu/f6.png" alt=""></div>
+  </div>
+</section>
+</body></html>

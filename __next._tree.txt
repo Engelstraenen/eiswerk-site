@@ -1,0 +1,5 @@
+:HL["/eiswerk-site/_next/static/chunks/1qigs-r8_qe2o.css","style"]
+:HL["/eiswerk-site/_next/static/media/d90dd95b053d9495-s.p.3r2y_bth_sjsm.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/eiswerk-site/_next/static/media/dcfedef55b10026d-s.p.40m0sdlh8l0dz.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+1:[["children",{"s":"__PAGE__","h":160}]]
+0:{"b":"-KTgwp3cgWVzZpw-LYnkA","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
