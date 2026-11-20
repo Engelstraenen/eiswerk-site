@@ -4,10 +4,11 @@ import dynamic from "next/dynamic";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ACTS, BRIDGE_IN, BRIDGE_START, PLAY_END } from "@/lib/acts";
+import { MOBILE_MQ, PORTRAIT_SRC_MAX_ASPECT, focusAt, isMobile } from "@/lib/responsive";
 import { MENU_PAGES } from "@/lib/menu";
 import { MenuOverlay } from "./MenuOverlay";
 import { SiteNav } from "./SiteNav";
-import { SEGS, interReg, type Seg } from "@/lib/segments";
+import { SEGS, actReg, interReg, segVh, totalVh, type Seg } from "@/lib/segments";
 import { Interlude } from "./Interludes";
 import { sceneState } from "@/lib/state";
 import { asset } from "@/lib/asset";
@@ -28,6 +29,12 @@ const win = (p: number, c: number, span: number) => {
   if (p < c - h || p > c + h) return 0;
   return Math.min(smooth((p - (c - h)) / ramp), smooth((c + h - p) / ramp));
 };
+// Mobil: Beats etwas später (nach dem Einstiegsbild), jeder als kurzer senkrechter Auf-/Abgang
+const M_BEATS = [0.18, 0.36, 0.54];
+const M_SPAN = 0.15;
+// Höhe für die Segment-Längen: mobil die stabile große Viewport-Höhe (100vh = lvh), damit das
+// Ein-/Ausblenden der Browserleiste die Szenen nicht verschiebt. Desktop wie bisher innerHeight.
+const layoutH = (mobile: boolean, probe: HTMLElement | null) => (mobile && probe ? probe.offsetHeight || window.innerHeight : window.innerHeight);
 
 export default function Experience() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,6 +48,7 @@ export default function Experience() {
   const counterRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const lenisRef = useRef<Lenis | null>(null);
+  const vhRef = useRef<HTMLDivElement>(null);
   const nav = useRef({ act: -1, arrived: false }).current; // Ziel eines Menü-Sprungs
   const [ready, setReady] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -70,12 +78,22 @@ export default function Experience() {
     const ctx = canvas.getContext("2d")!;
     const vids = videoRefs.current as HTMLVideoElement[];
     let dpr = Math.min(window.devicePixelRatio || 1, sceneState.quality < 1 ? 1.25 : 1.75);
+    let mobile = isMobile();
+    // Leinwand wird im Frame angepasst (direkt vor dem Zeichnen), so blitzt beim Ein-/Ausblenden
+    // der mobilen Browserleiste kein leeres Bild auf.
+    const fit = () => {
+      const w = Math.floor(window.innerWidth * dpr);
+      const h = Math.floor(window.innerHeight * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+    };
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, sceneState.quality < 1 ? 1.25 : 1.75);
-      canvas.width = Math.floor(window.innerWidth * dpr);
-      canvas.height = Math.floor(window.innerHeight * dpr);
+      mobile = isMobile();
     };
-    resize();
+    fit();
     window.addEventListener("resize", resize);
 
     const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, smoothWheel: true });
@@ -142,7 +160,25 @@ export default function Experience() {
       void blur;
     };
 
-    const drawVideo = (v: HTMLCanvasElement, scale: number, blur: number, shift: number) => {
+    // Mobil: bildfüllend (object-fit: cover) mit Fokuspunkt; keine verkleinerte 16:9-Bühne
+    const drawCover = (v: HTMLCanvasElement, scale: number, blur: number, shift: number, fx: number) => {
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const vw = v.width || 608;
+      const vh = v.height || 1080;
+      const s = Math.max(cw / vw, ch / vh) * Math.max(1, scale) * (1 + 0.12 * shift);
+      const w = vw * s;
+      const h = vh * s;
+      // Erklär-Phase: Produkt leicht nach oben, über das Panel
+      const x = clamp(cw / 2 - fx * w, cw - w, 0);
+      const y = clamp((ch - h) / 2 - shift * ch * 0.06, ch - h, 0);
+      if (supportsFilter && blur > 0.2) ctx.filter = `blur(${blur * dpr}px)`;
+      ctx.drawImage(v, x, y, w, h);
+      if (supportsFilter) ctx.filter = "none";
+    };
+
+    const drawVideo = (v: HTMLCanvasElement, scale: number, blur: number, shift: number, fx = 0.5) => {
+      if (mobile) return drawCover(v, scale, blur, shift, fx);
       const cw = canvas.width;
       const ch = canvas.height;
       if (cw / ch < 0.8) return drawPortrait(v, scale, blur, shift);
@@ -186,26 +222,57 @@ export default function Experience() {
       if (Math.abs(v.currentTime - t) > 0.012) v.currentTime = t;
     };
 
-    const posters = ACTS.map((a) => {
-      const im = new Image();
-      im.decoding = "async";
-      im.src = a.poster;
-      return im;
+    // Videoquelle: Handy hochkant → 9:16-Fassung, sonst 16:9-Original
+    const wantPortrait = () => mobile && window.innerWidth / layoutH(true, vhRef.current) < PORTRAIT_SRC_MAX_ASPECT;
+    let portrait = wantPortrait();
+    const srcOf = (a: number) => (portrait ? ACTS[a].videoPortrait : ACTS[a].video);
+    vids.forEach((v, a) => {
+      if (v.getAttribute("src") !== srcOf(a)) v.setAttribute("src", srcOf(a));
     });
+    const postersL: (HTMLImageElement | undefined)[] = [];
+    const postersP: (HTMLImageElement | undefined)[] = [];
+    const posterOf = (a: number) => {
+      const arr = portrait ? postersP : postersL;
+      if (!arr[a]) {
+        const im = new Image();
+        im.decoding = "async";
+        im.src = portrait ? ACTS[a].posterPortrait : ACTS[a].poster;
+        arr[a] = im;
+      }
+      return arr[a]!;
+    };
+    // Desktop lädt wie bisher alle Poster vorab, das Handy nur das erste (Rest beim Annähern)
+    if (!portrait) ACTS.forEach((_, a) => posterOf(a));
     const segBg = (sg: Seg): [number, number, number] => (sg.kind === "act" ? ACTS[sg.act].bg : sg.bg);
     const starts: number[] = [];
     const lens: number[] = [];
     const layout = () => {
-      const H = window.innerHeight;
+      const H = layoutH(mobile, vhRef.current);
       let c = 0;
       SEGS.forEach((sg, i) => {
         starts[i] = c;
-        lens[i] = (sg.vh / 100) * H;
+        lens[i] = (segVh(sg, mobile) / 100) * H;
         c += lens[i];
       });
     };
     layout();
-    window.addEventListener("resize", layout);
+    // Mobil: beim Drehen bzw. Wechsel über 1024 px Szene und Fortschritt halten (sonst landet man
+    // nach dem Drehen in einer anderen Szene, weil die Längen an der Bildschirmhöhe hängen)
+    const locate = (y: number) => {
+      let i = 0;
+      for (let k = 0; k < SEGS.length; k++) if (y >= starts[k] - 0.5) i = k;
+      return { i, p: lens[i] ? clamp((y - starts[i]) / lens[i]) : 0 };
+    };
+    let wasMobile = mobile;
+    const relayout = () => {
+      const keep = mobile || wasMobile ? locate(window.scrollY) : null;
+      layout();
+      wasMobile = mobile;
+      if (!keep) return;
+      const target = starts[keep.i] + keep.p * lens[keep.i];
+      if (Math.abs(target - window.scrollY) > 2) lenis.scrollTo(target, { immediate: true, force: true });
+    };
+    window.addEventListener("resize", relayout);
     const prevActOf = (i: number) => {
       for (let k = i; k >= 0; k--) {
         const sg = SEGS[k];
@@ -219,16 +286,34 @@ export default function Experience() {
     const warm = (a: number) => {
       if (started.has(a)) return;
       started.add(a);
+      posterOf(a);
       const v = vids[a];
       if (v) {
         v.preload = "auto";
         v.load();
       }
     };
+    // Drehen des Handys: passende Fassung nachladen
+    const swapSources = () => {
+      const np = wantPortrait();
+      if (np === portrait) return;
+      portrait = np;
+      vids.forEach((v, a) => {
+        bufs[a].ok = false;
+        v.setAttribute("src", srcOf(a));
+        if (started.has(a)) {
+          posterOf(a);
+          v.preload = "auto";
+          v.load();
+        }
+      });
+    };
+    window.addEventListener("resize", swapSources);
     let lastTheme = -1;
 
     const frame = (time: number) => {
       lenis.raf(time);
+      fit();
       const H = window.innerHeight;
       const max = document.documentElement.scrollHeight - H;
       const y = window.scrollY;
@@ -273,12 +358,14 @@ export default function Experience() {
         ctx.fillRect(0, 0, cw, ch);
         const layerOn = Math.max(outT, inT) > 0.999;
         // Solange das Video noch kein Bild liefert, steht das Poster (kein leerer Einstiegsbildschirm)
-        const pim = posters[seg.act];
+        const pim = posterOf(seg.act);
         const src = buf && buf.ok ? buf : pim && pim.complete && pim.naturalWidth ? (pim as unknown as HTMLCanvasElement) : null;
         if (src && !layerOn) {
           const scale = 1 + 0.32 * smooth(outT) - 0.16 * inT + 0.06 * playP;
           const shift = smooth((p - PLAY_END) / 0.08) * (1 - smooth((p - (BRIDGE_START - 0.05)) / 0.06));
-          drawVideo(src, scale, outT * 16 + inT * 14, shift);
+          // Fokus nur nötig, wenn das 16:9-Original beschnitten wird (die 9:16-Fassung folgt dem Motiv schon)
+          const fx = mobile && !portrait ? focusAt(A.focus, playP * (v && v.duration ? v.duration : 10.125)) : 0.5;
+          drawVideo(src, scale, outT * 16 + inT * 14, shift, fx);
         }
         const fogA = Math.max(outT, inT);
         if (fogA > 0.001) {
@@ -341,15 +428,22 @@ export default function Experience() {
         nav.act = -1;
         nav.arrived = false;
       }
-      const heroOp = clamp(1 - y / (0.76 * H));
+      const heroOp = clamp(1 - y / ((mobile ? 0.45 : 0.76) * H));
       if (heroRef.current) {
         heroRef.current.style.opacity = String(heroOp);
-        heroRef.current.style.transform = `translateY(calc(-50% + ${(1 - heroOp) * -40}px)) scale(${1 + (1 - heroOp) * 0.06})`;
+        // mobil ohne Skalierung (kein Überstand über den Rand), nur senkrecht
+        heroRef.current.style.transform = mobile ? `translateY(calc(-50% + ${(1 - heroOp) * -32}px))` : `translateY(calc(-50% + ${(1 - heroOp) * -40}px)) scale(${1 + (1 - heroOp) * 0.06})`;
       }
       if (cueRef.current) cueRef.current.style.opacity = String(heroOp * 0.9);
 
       // Beats
       ACTS.forEach((ac, ai) => {
+        const mob = actReg[ai];
+        if (mob) {
+          // mobil: eigene gsap-Timeline (gsap.matchMedia), nur der laufende Akt bekommt Fortschritt
+          mob(ai === curAct ? p : 0);
+          return;
+        }
         ac.beats.forEach((b, bi) => {
           const el = beatRefs.current[ai][bi];
           if (!el) return;
@@ -390,14 +484,15 @@ export default function Experience() {
     };
     void first;
     // Poster reicht für den Einstieg: Ladebildschirm geht weg, sobald das Poster dekodiert ist (Video lädt nach)
-    posters[0].decode().then(done).catch(() => undefined);
+    posterOf(0).decode().then(done).catch(() => undefined);
     const t = setTimeout(done, 2500);
 
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(t);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("resize", layout);
+      window.removeEventListener("resize", relayout);
+      window.removeEventListener("resize", swapSources);
       vids.forEach((v, i) => {
         v.removeEventListener("seeked", grabbers[i]);
         v.removeEventListener("loadeddata", grabbers[i]);
@@ -406,8 +501,53 @@ export default function Experience() {
     };
   }, [reduced]);
 
+  // Mobil (< 1024 px): Beats + Erklär-Panel als kurze, senkrechte gsap-Abläufe über gsap.matchMedia().
+  // Der Scroll-Fortschritt des Akts (0..1) treibt die Timeline; Desktop nutzt weiter die Rechnung im Frame.
+  useEffect(() => {
+    if (reduced) return;
+    const mm = gsap.matchMedia();
+    mm.add(MOBILE_MQ, () => {
+      const all = [...beatRefs.current.flat(), ...explainRefs.current].filter(Boolean) as HTMLElement[];
+      gsap.set(all, { clearProps: "transform,opacity,visibility" });
+      const last: number[] = [];
+      ACTS.forEach((a, ai) => {
+        const tl = gsap.timeline({ paused: true, defaults: { ease: "none" } });
+        a.beats.forEach((_, bi) => {
+          const el = beatRefs.current[ai][bi];
+          if (!el) return;
+          const at = M_BEATS[bi] ?? 0.18 + bi * 0.18;
+          const ramp = M_SPAN * 0.3;
+          tl.fromTo(el, { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: ramp, ease: "power2.out" }, at - M_SPAN / 2);
+          tl.to(el, { autoAlpha: 0, y: -24, duration: ramp, ease: "power2.in" }, at + M_SPAN / 2 - ramp);
+        });
+        const ex = explainRefs.current[ai];
+        if (ex) {
+          const start = PLAY_END + 0.02;
+          const end = BRIDGE_START - 0.01;
+          tl.fromTo(ex, { autoAlpha: 0, y: 48 }, { autoAlpha: 1, y: 0, duration: 0.05, ease: "power2.out" }, start);
+          ex.querySelectorAll<HTMLElement>(".row").forEach((r, ri) => {
+            tl.fromTo(r, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.04, ease: "power2.out" }, start + 0.015 + ri * 0.03);
+          });
+          tl.to(ex, { autoAlpha: 0, y: 24, duration: 0.035, ease: "power2.in" }, end - 0.035);
+        }
+        tl.set({}, {}, 1); // Zeitachse = Akt-Fortschritt 0..1
+        last[ai] = -1;
+        actReg[ai] = (p: number) => {
+          if (Math.abs(p - last[ai]) < 0.0002) return;
+          last[ai] = p;
+          tl.progress(p);
+        };
+      });
+      return () => {
+        ACTS.forEach((_, ai) => delete actReg[ai]);
+      };
+    });
+    return () => mm.revert();
+  }, [reduced]);
+
   const goTo = (i: number) => {
-    const H = window.innerHeight;
+    const mob = isMobile();
+    const H = layoutH(mob, vhRef.current);
     let c = 0;
     let target = 0;
     for (const sg of SEGS) {
@@ -415,9 +555,9 @@ export default function Experience() {
         target = c + 3;
         break;
       }
-      c += (sg.vh / 100) * H;
+      c += (segVh(sg, mob) / 100) * H;
     }
-    if (i === 0) target = 0.82 * H; // Eis: hinter dem Einstiegsbild (Hero) landen
+    if (i === 0) target = (mob ? 0.5 : 0.82) * H; // Eis: hinter dem Einstiegsbild (Hero) landen
     nav.act = i;
     nav.arrived = false;
     lenisRef.current?.scrollTo(target, { duration: 2.4, easing: (t) => 1 - Math.pow(1 - t, 4) });
@@ -472,7 +612,8 @@ export default function Experience() {
       ))}
 
       <MenuText className="sr-only" />
-      <div style={{ height: `${SEGS.reduce((a, b) => a + b.vh, 0)}vh` }} aria-hidden />
+      <div className="story" style={{ ["--story-d" as string]: `${totalVh(false)}vh`, ["--story-m" as string]: `${totalVh(true)}vh` }} aria-hidden />
+      <div className="vh-probe" ref={vhRef} aria-hidden />
 
       <div className="stage" aria-hidden>
         {ACTS.map((a, i) => (
@@ -482,7 +623,6 @@ export default function Experience() {
               videoRefs.current[i] = el;
             }}
             src={a.video}
-            poster={a.poster}
             muted
             playsInline
             preload="none"
