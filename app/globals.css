@@ -16,6 +16,8 @@ body {
   overflow-x: hidden;
 }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.story { height: var(--story-d); }
+.vh-probe { position: absolute; top: 0; left: 0; width: 0; height: 100vh; visibility: hidden; pointer-events: none; }
 
 .stage { position: fixed; inset: 0; overflow: hidden; }
 .stage canvas.frames { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -442,4 +444,147 @@ html.menu-dark .counter, html.menu-dark .dots { color: #fbeee4; }
   .kf-cta { left: 20px; right: 20px; bottom: 28px; }
   .kf-cta button { width: 100%; padding: 15px 20px; }
   .kf-cta span { display: none; }
+}
+
+/* ==========================================================================
+   MOBIL & TABLET (< 1024 px) · eigene Hochformat-Komposition (Eugen 20.11.2026)
+   Desktop ab 1024 px bleibt unverändert: alle Regeln hier gelten nur darunter.
+   Regeln: kein seitlicher Überstand, Schrift ≥ 12 px, Tippflächen ≥ 44 px.
+   ========================================================================== */
+.sn-demo { display: none; }
+@media (max-width: 1023px) {
+  :root { --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px); --safe-l: env(safe-area-inset-left, 0px); --safe-r: env(safe-area-inset-right, 0px); --bar-t: calc(10px + var(--safe-t)); --gut: max(16px, var(--safe-l)); --gut-r: max(16px, var(--safe-r)); }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  .story { height: var(--story-m); }
+  button { -webkit-tap-highlight-color: transparent; }
+
+  /* HUD: Logo · Menü · Zähler in einer 44-px-Leiste */
+  .brand { top: calc(var(--bar-t) + 13px); left: var(--gut); height: 18px; z-index: 2; }
+  .counter { top: calc(var(--bar-t) + 6px); right: var(--gut-r); font-size: 12px; letter-spacing: .14em; }
+  .counter b { font-size: 18px; }
+  .sn-burger { top: var(--bar-t); right: calc(var(--gut-r) + 44px); width: 44px; height: 44px; }
+  .dots { display: none; }
+  .demo { display: none; }
+  .cue { bottom: calc(22px + var(--safe-b)); font-size: 12px; }
+  .cue span { height: 36px; }
+  .sitenav { top: calc(var(--bar-t) + 54px); left: var(--gut); right: var(--gut-r); max-width: 520px; margin-left: auto; padding: 6px 18px 12px; }
+  .sitenav button { min-height: 48px; font-size: 13px; padding: 12px 4px; }
+  .sitenav .sn-menu { padding: 12px 4px; }
+  .sn-demo { display: block; padding: 12px 4px 2px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; opacity: .6; }
+
+  /* Einstieg */
+  .hero { padding: 0 var(--gut-r) 0 var(--gut); }
+  .hero h1 { font-size: clamp(52px, 16.5vw, 150px); letter-spacing: .01em; }
+  .hero p { font-size: clamp(17px, 4.8vw, 26px); }
+  .hero h1, .hero p { text-shadow: 0 0 26px rgba(255,242,246,.9), 0 2px 10px rgba(255,242,246,.7); }
+  /* leichter Verlauf oben, damit Logo, Menü und Zähler auf jedem Videobild lesbar bleiben */
+  .stage::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: calc(96px + var(--safe-t)); pointer-events: none; background: linear-gradient(rgba(255,255,255,.34), rgba(255,255,255,0)); background: linear-gradient(color-mix(in srgb, var(--bg) 62%, transparent), transparent); }
+
+  /* Beats: Karte unten, Bild oben frei */
+  .beat.left, .beat.right, .beat.center { left: var(--gut); right: var(--gut-r); top: auto; bottom: calc(24px + var(--safe-b)); max-width: 560px; margin: 0 auto; text-align: left; }
+  .beat { padding: 18px 20px 20px; border-radius: 22px; background: rgba(255,255,255,.84); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); box-shadow: 0 18px 50px rgba(0,0,0,.14); border: 1px solid rgba(255,255,255,.6); }
+  .beat .k { font-size: 12px; letter-spacing: .2em; margin-bottom: 8px; }
+  .beat h2 { font-size: clamp(28px, 8.4vw, 46px); line-height: 1.02; }
+  .beat p { margin-top: 10px; font-size: clamp(15px, 4.2vw, 18px); line-height: 1.45; opacity: .9; }
+
+  /* Erklär-Panel als Blatt von unten */
+  .explain { left: var(--gut); right: var(--gut-r); width: auto; max-width: 560px; margin: 0 auto; bottom: calc(16px + var(--safe-b)); padding: 18px 20px 6px; border-radius: 22px; background: rgba(255,255,255,.86); }
+  .explain h3 { font-size: clamp(22px, 6.4vw, 32px); margin-bottom: 6px; line-height: 1.1; }
+  .explain .row { grid-template-columns: 30px 1fr; gap: 2px 10px; padding: 10px 0; }
+  .explain .row em { font-size: 12px; }
+  .explain .row strong { font-size: 16px; }
+  .explain .row span { font-size: 14px; line-height: 1.4; }
+
+  /* Showcase (Produktpräsentation): Kopf oben, Gericht mittig, Name + Fakten unten */
+  .il-k { font-size: 12px; letter-spacing: .3em; }
+  .bt-head { left: var(--gut); right: var(--gut-r); top: calc(var(--bar-t) + 62px); max-width: 30ch; }
+  .bt-head h2 { margin-top: 8px; font-size: clamp(22px, 6.2vw, 34px); line-height: 1.12; }
+  .bt-item { left: 50%; top: 48%; width: min(76vw, 44vh, 460px); margin-top: 0; filter: drop-shadow(0 26px 26px rgba(0,0,0,.42)); }
+  .bt-item img { max-height: 40vh; margin: 0 auto; }
+  .bt-name { left: var(--gut); right: var(--gut-r); bottom: calc(96px + 3vh + var(--safe-b)); }
+  .bt-name span { font-size: clamp(30px, 8.6vw, 54px); line-height: 1.05; }
+  .bt-name small { font-size: 12px; letter-spacing: .22em; margin-top: 8px; }
+  .bt-facts { left: var(--gut); right: var(--gut-r); top: auto; bottom: calc(18px + var(--safe-b)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 8px; text-align: center; font-size: 12px; letter-spacing: .04em; line-height: 1.3; }
+  .bt-facts span { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .bt-facts b { font-size: 24px; margin: 0; line-height: 1; }
+  .bt-ghost { top: 0; left: 50%; writing-mode: vertical-rl; font-size: clamp(150px, 46vw, 340px); -webkit-text-stroke: 1px rgba(255,255,255,.18); }
+  .blob { filter: blur(60px); }
+  .blob.b1 { width: 80vw; height: 80vw; }
+  .blob.b2 { width: 70vw; height: 70vw; }
+  .blob.b3 { width: 60vw; height: 60vw; left: 20vw; }
+
+  /* Finale = Die Karte */
+  .kf-head { top: calc(var(--bar-t) + 60px); left: var(--gut); }
+  .kf-list { top: calc(var(--bar-t) + 88px); left: var(--gut); right: var(--gut-r); width: auto; max-width: 640px; transform: none; }
+  .kf-row { min-height: 48px; padding: 8px 0; gap: 12px; grid-template-columns: auto 1fr auto; align-items: center; }
+  .kf-row em { font-size: 12px; }
+  .kf-row strong { font-size: clamp(24px, 7.4vw, 44px); }
+  .kf-row span { display: none; }
+  .kf-stage { left: var(--gut); right: var(--gut-r); width: auto; top: calc(var(--bar-t) + 88px + 6 * 50px + 16px); bottom: calc(112px + var(--safe-b)); height: auto; transform: none; }
+  .kf-cta { left: var(--gut); right: var(--gut-r); bottom: calc(18px + var(--safe-b)); flex-direction: column; align-items: stretch; gap: 10px; max-width: 640px; }
+  .kf-cta button { width: 100%; min-height: 52px; padding: 14px 20px; font-size: 13px; letter-spacing: .22em; }
+  .kf-cta span { display: block; text-align: center; font-size: 12px; letter-spacing: .16em; }
+
+  /* Speisekarte (Overlay) */
+  .mo-head { padding: calc(8px + var(--safe-t)) var(--gut-r) 8px var(--gut); gap: 12px; row-gap: 6px; flex-wrap: wrap; }
+  .mo-head img { height: 16px; }
+  .mo-head .mo-close { min-height: 44px; padding: 0 14px; font-size: 12px; letter-spacing: .12em; white-space: nowrap; }
+  .mo-head .mo-tabs { order: 3; flex-basis: 100%; justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; gap: 8px; padding: 2px 0 6px; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+  .mo-head .mo-tabs::-webkit-scrollbar { display: none; }
+  .mo-head .mo-tabs button { flex: none; min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; font-size: 12px; letter-spacing: .12em; }
+  .mo-scroll { padding: calc(132px + var(--safe-t)) var(--gut-r) calc(24px + var(--safe-b)) var(--gut) !important; }
+  .mo-intro { margin: 2vh 0 6vh; }
+  .mo-intro p, .mc-h p { font-size: 12px; letter-spacing: .3em; }
+  .mo-cat { scroll-margin-top: calc(140px + var(--safe-t)); }
+  .mc-row h4 small { font-size: 12px; letter-spacing: .12em; padding: 3px 9px; margin-left: 8px; }
+  .mc-row { min-height: 72px; }
+  .mo-foot { font-size: 12px; letter-spacing: .2em; line-height: 1.6; }
+}
+
+/* Handy hochkant: Zeile = Bild · Text, Preis unter dem Namen (sonst wird die Textspalte zu schmal) */
+@media (max-width: 560px) {
+  .mc-row { grid-template-columns: 76px 1fr; grid-template-areas: "th main" "th price"; gap: 4px 14px; align-items: start; }
+  .mc-th { grid-area: th; width: 76px; height: 92px; align-self: start; }
+  .mc-row > div { grid-area: main; }
+  .mc-row b { grid-area: price; font-size: 19px; color: #c2457a; }
+  .mc-row h4 { font-size: 22px; line-height: 1.15; }
+}
+
+/* Kleine Handys (z. B. 320 × 568): Karte ohne Bildbühne, Showcase kompakter */
+@media (max-width: 1023px) and (max-height: 660px) {
+  .kf-stage { display: none; }
+  .bt-item { top: 47%; }
+  .bt-item img { max-height: 34vh; }
+  .bt-name { bottom: calc(92px + var(--safe-b)); }
+  .bt-name span { font-size: 28px; }
+  .bt-head h2 { font-size: 21px; }
+}
+@media (max-width: 359px) {
+  .mo-head img { height: 14px; }
+  .bt-facts b { font-size: 21px; }
+}
+
+/* Handy quer: Text neben das Bild statt darüber */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 540px) {
+  .beat.left, .beat.right, .beat.center, .explain { right: auto; width: min(46vw, 420px); margin: 0; bottom: calc(12px + var(--safe-b)); }
+  .beat { padding: 14px 16px; }
+  .beat h2 { font-size: 26px; }
+  .beat p { font-size: 14px; }
+  .explain { padding: 12px 16px 4px; }
+  .explain h3 { font-size: 20px; }
+  .explain .row { padding: 6px 0; }
+  .explain .row span { font-size: 13px; }
+  .bt-head { max-width: 44vw; }
+  .bt-item { top: 52%; width: min(40vw, 62vh); }
+  .bt-item img { max-height: 60vh; }
+  .bt-name { left: auto; right: var(--gut-r); bottom: calc(76px + var(--safe-b)); width: 40vw; }
+  .bt-name span { font-size: 28px; }
+  .bt-facts { left: auto; width: 48vw; }
+  .kf-list { right: 50%; top: calc(var(--bar-t) + 60px); }
+  .kf-head { top: calc(var(--bar-t) + 40px); }
+  .kf-row { min-height: 44px; padding: 2px 0; }
+  .kf-row strong { font-size: 24px; }
+  .kf-stage { display: block; left: 52%; top: calc(var(--bar-t) + 56px); bottom: 84px; }
+  .kf-cta { left: 52%; }
+  .mo-scroll { padding-top: calc(116px + var(--safe-t)) !important; }
 }

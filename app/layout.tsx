@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   // Statische Demo-Version (GitHub Pages) nicht indexieren
   ...(BASE ? { metadataBase: new URL("https://engelstraenen.github.io"), robots: { index: false, follow: false } } : {}),
 };
-export const viewport: Viewport = { themeColor: "#f4c4d4", width: "device-width", initialScale: 1 };
+// viewportFit cover: Video läuft auf Handys mit Notch bis an den Rand, HUD hält per env(safe-area-inset-*) Abstand
+export const viewport: Viewport = { themeColor: "#f4c4d4", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

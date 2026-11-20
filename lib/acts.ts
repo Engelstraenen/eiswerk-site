@@ -1,4 +1,5 @@
 import { asset } from "./asset";
+import type { FocusKey } from "./responsive";
 export type Beat = {
   at: number; // lokale Position im Akt 0..1, Mitte des Beats
   span: number; // Dauer in lokaler Position
@@ -15,6 +16,11 @@ export type Act = {
   tagline: string;
   video: string;
   poster: string;
+  // Handy hochkant: 9:16-Fassung (608x1080, All-Intra) und deren erstes Bild als Poster
+  videoPortrait: string;
+  posterPortrait: string;
+  // Fokuspfad für bildfüllenden Beschnitt des 16:9-Originals auf Tablet/Handy quer
+  focus: FocusKey[];
   bg: [number, number, number];
   ink: string;
   accent: string;
@@ -32,6 +38,9 @@ export const ACTS: Act[] = [
     tagline: "Eis wie ein Kunstwerk.",
     video: asset("/assets/video/eis.mp4"),
     poster: asset("/assets/poster/eis.jpg"),
+    videoPortrait: asset("/assets/video/eis-portrait.mp4"),
+    posterPortrait: asset("/assets/poster/eis-portrait.jpg"),
+    focus: [[0, 0.49], [4, 0.48], [6, 0.47], [7.5, 0.5], [10.2, 0.5]],
     bg: [244, 196, 212],
     ink: "#4a1230",
     accent: "#c2457a",
@@ -57,6 +66,9 @@ export const ACTS: Act[] = [
     tagline: "Dicht. Kalt. Schokoladig.",
     video: asset("/assets/video/shake.mp4"),
     poster: asset("/assets/poster/shake.jpg"),
+    videoPortrait: asset("/assets/video/shake-portrait.mp4"),
+    posterPortrait: asset("/assets/poster/shake-portrait.jpg"),
+    focus: [[0, 0.5], [4, 0.49], [5.5, 0.5], [10.2, 0.5]],
     bg: [238, 214, 196],
     ink: "#3a2118",
     accent: "#8a4a2d",
@@ -82,6 +94,9 @@ export const ACTS: Act[] = [
     tagline: "Dick. Dunkel. Tropisch.",
     video: asset("/assets/video/acai.mp4"),
     poster: asset("/assets/poster/acai.jpg"),
+    videoPortrait: asset("/assets/video/acai-portrait.mp4"),
+    posterPortrait: asset("/assets/poster/acai-portrait.jpg"),
+    focus: [[0, 0.47], [2.2, 0.49], [3.5, 0.5], [10.2, 0.5]],
     bg: [221, 206, 238],
     ink: "#2f1b4d",
     accent: "#6d3fb0",
@@ -107,6 +122,9 @@ export const ACTS: Act[] = [
     tagline: "Karamell trifft Crunch.",
     video: asset("/assets/video/coffee.mp4"),
     poster: asset("/assets/poster/coffee.jpg"),
+    videoPortrait: asset("/assets/video/coffee-portrait.mp4"),
+    posterPortrait: asset("/assets/poster/coffee-portrait.jpg"),
+    focus: [[0, 0.5], [4.5, 0.5], [5.3, 0.46], [6.3, 0.5], [7.2, 0.5], [8.2, 0.515], [10.2, 0.52]],
     bg: [226, 190, 148],
     ink: "#3b2410",
     accent: "#b0682a",
@@ -132,6 +150,9 @@ export const ACTS: Act[] = [
     tagline: "Selbstgemacht. In unseren Kesseln.",
     video: asset("/assets/video/manufaktur.mp4"),
     poster: asset("/assets/poster/manufaktur.jpg"),
+    videoPortrait: asset("/assets/video/manufaktur-portrait.mp4"),
+    posterPortrait: asset("/assets/poster/manufaktur-portrait.jpg"),
+    focus: [[0, 0.44], [0.7, 0.5], [1.2, 0.58], [2.6, 0.56], [3.6, 0.5], [5.6, 0.52], [6.6, 0.6], [7.6, 0.56], [8.6, 0.48], [10.2, 0.47]],
     bg: [244, 196, 212],
     ink: "#4a1230",
     accent: "#b0502f",
@@ -153,6 +174,7 @@ export const ACTS: Act[] = [
 ];
 
 export const ACT_VH = 560; // Scroll-Länge pro Akt in vh
+export const ACT_MVH = 300; // mobil: kürzerer, senkrechter Ablauf
 export const PLAY_END = 0.7; // Ab hier steht das Video am letzten Bild (Erklär-Phase)
 export const BRIDGE_START = 0.88; // Brücke zum nächsten Akt
 export const BRIDGE_IN = 0.12; // Einblendung des neuen Akts
