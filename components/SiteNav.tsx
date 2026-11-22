@@ -35,6 +35,7 @@ export function SiteNav({ onGo }: { onGo: (i: number) => void }) {
         <button className="sn-menu" onClick={menu} aria-haspopup="dialog">
           Speisekarte
         </button>
+        <p className="sn-demo">Demo · keine echte Eisdiele</p>
       </nav>
       <button className="sn-burger" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label="Menü">
         <span />

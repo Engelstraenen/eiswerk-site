@@ -5,8 +5,9 @@ import { interReg, type InterId } from "@/lib/segments";
 import { sceneState } from "@/lib/state";
 import { MENU_CATS } from "@/lib/dishes";
 import { asset } from "@/lib/asset";
+import { DESKTOP_MQ, MOBILE_MQ } from "@/lib/responsive";
 
-const IMG = (n: string) => `/interlude/${n}.jpg`;
+const IMG = (n: string) => asset(`/interlude/${n}.jpg`);
 
 function useScrub(id: InterId, build: (root: HTMLDivElement) => gsap.core.Timeline) {
   const ref = useRef<HTMLDivElement>(null);
@@ -142,6 +143,13 @@ function Showcase({ id }: { id: InterId }) {
     let skew = 0;
     let lastP = 0;
     const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const paintBg = (i: number) => {
+      const cur = def.items[i];
+      const c1 = hex(cur.c1);
+      const c2 = hex(cur.c2);
+      bgA.style.background = `radial-gradient(ellipse at 50% 55%, rgba(${c1.join(",")},.55) 0%, rgba(${c2.join(",")},.95) 62%, rgb(${c2.map((v) => Math.round(v * 0.55)).join(",")}) 100%)`;
+    };
+    const touched = [...items, ...names, bgA, ghost, head, ...blobs, ...dots];
     const upd = (p: number) => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
@@ -258,10 +266,7 @@ function Showcase({ id }: { id: InterId }) {
         el.style.opacity = String(o);
         el.style.transform = `translate3d(${off}px, 0, 0) scale(${0.92 + o * 0.08})`;
       });
-      const cur = def.items[best];
-      const c1 = hex(cur.c1);
-      const c2 = hex(cur.c2);
-      bgA.style.background = `radial-gradient(ellipse at 50% 55%, rgba(${c1.join(",")},.55) 0%, rgba(${c2.join(",")},.95) 62%, rgb(${c2.map((v) => Math.round(v * 0.55)).join(",")}) 100%)`;
+      paintBg(best);
       const gdir = def.mode === "diag" || def.mode === "rtl" ? 1 : -1;
       ghost.style.transform = `translate3d(${(gdir * -p * 0.6 + 0.1) * vw * 2.6}px, -50%, 0)`;
       blobs.forEach((b, i) => {
@@ -274,14 +279,85 @@ function Showcase({ id }: { id: InterId }) {
       head.style.opacity = String(Math.min(1, p * 12) * Math.min(1, (1 - p) * 12));
       lastP = p;
     };
-    interReg[id] = upd;
-    upd(lastP);
-    const tick = () => upd(lastP);
-    gsap.ticker.add(tick);
-    return () => {
-      gsap.ticker.remove(tick);
-      delete interReg[id];
-    };
+    const mm = gsap.matchMedia();
+    // Desktop (ab 1024 px): unverändert, Einflug quer über die Bühne
+    mm.add(DESKTOP_MQ, () => {
+      interReg[id] = upd;
+      upd(lastP);
+      const tick = () => upd(lastP);
+      gsap.ticker.add(tick);
+      return () => {
+        gsap.ticker.remove(tick);
+        delete interReg[id];
+        gsap.set(touched, { clearProps: "transform,opacity,filter,zIndex,background" });
+      };
+    });
+    // Mobil: Hochformat-Komposition, jedes Gericht steigt von unten in die Bildmitte, hält kurz und
+    // geht nach oben ab (kurze, senkrechte Abläufe, nichts ragt seitlich über den Rand)
+    mm.add(MOBILE_MQ, () => {
+      gsap.set(touched, { clearProps: "transform,opacity,filter,zIndex,background" });
+      const tl = gsap.timeline({ paused: true, defaults: { ease: "none" } });
+      const step = 1 / (N + 0.35);
+      const inD = step * 0.5;
+      const outD = step * 0.45;
+      // je Produkt eine eigene Note, alles senkrecht
+      const enter: Record<Mode, gsap.TweenVars> = {
+        ltr: { yPercent: 70, rotation: -8, scale: 0.72 },
+        rtl: { yPercent: 85, rotation: 0, scale: 0.45 },
+        rise: { yPercent: 80, rotationY: 70, scale: 0.6 },
+        diag: { yPercent: 80, rotation: 14, scale: 0.7 },
+        drop: { yPercent: -80, rotation: 10, scale: 0.8 },
+      };
+      const exit: Record<Mode, gsap.TweenVars> = {
+        ltr: { yPercent: -75, rotation: 7, scale: 0.8 },
+        rtl: { yPercent: -70, rotation: 0, scale: 1.15 },
+        rise: { yPercent: -60, rotationY: -25, scale: 1.25 },
+        diag: { yPercent: -80, rotation: -12, scale: 0.8 },
+        drop: { yPercent: 80, rotation: -10, scale: 0.8 },
+      };
+      const easeIn = def.mode === "rtl" ? "back.out(1.6)" : "power3.out";
+      gsap.set(items, { xPercent: -50, yPercent: -50, transformPerspective: 900, autoAlpha: 0 });
+      items.forEach((el, i) => {
+        const t0 = i * step;
+        el.style.zIndex = String(10 + i);
+        tl.fromTo(el, { ...enter[def.mode], autoAlpha: 0 }, { yPercent: -50, rotation: 0, rotationY: 0, scale: 1, autoAlpha: 1, duration: inD, ease: easeIn }, t0);
+        const n = names[i];
+        tl.fromTo(n, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: inD * 0.6, ease: "power2.out" }, t0 + inD * 0.45);
+        if (i < N - 1) {
+          tl.to(el, { ...exit[def.mode], autoAlpha: 0, duration: outD, ease: "power2.in" }, t0 + step * 0.92);
+          tl.to(n, { autoAlpha: 0, y: -18, duration: outD * 0.5, ease: "power2.in" }, t0 + step * 0.92);
+        }
+      });
+      tl.set({}, {}, 1);
+      let lastBg = -1;
+      const sync = (p: number) => {
+        tl.progress(p);
+        const i = Math.max(0, Math.min(N - 1, Math.floor(p / step - 0.25)));
+        if (i !== lastBg) {
+          lastBg = i;
+          paintBg(i);
+        }
+        const vh = window.innerHeight;
+        // Hintergrund-Schriftzug läuft senkrecht mit
+        ghost.style.transform = `translate3d(-50%, ${(0.15 - p * 0.9) * vh}px, 0)`;
+        blobs.forEach((b, k) => {
+          b.style.transform = `translate3d(${Math.sin(p * 5 + k * 1.7) * 10}vw, ${Math.cos(p * 4 + k * 2.1) * 14}vh, 0) scale(${1 + Math.sin(p * 6 + k) * 0.15})`;
+        });
+        dots.forEach((d, k) => {
+          const sp = 0.4 + (k % 5) * 0.28;
+          d.style.transform = `translate3d(0, ${-((p * sp * vh * 1.6) % (vh * 1.2))}px, 0)`;
+        });
+        head.style.opacity = String(Math.min(1, p * 12) * Math.min(1, (1 - p) * 12));
+        lastP = p;
+      };
+      interReg[id] = sync;
+      sync(lastP);
+      return () => {
+        delete interReg[id];
+        gsap.set(touched, { clearProps: "transform,opacity,filter,zIndex,background,visibility" });
+      };
+    });
+    return () => mm.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -488,6 +564,7 @@ function Finale() {
       r.addEventListener("pointerenter", enter[i]);
       r.addEventListener("pointerleave", leave);
     });
+    let mobile = false;
     const upd = (p: number) => {
       lastP = p;
       const n = rows.length;
@@ -495,7 +572,8 @@ function Finale() {
         const a = 0.04 + i * 0.07;
         const t = Math.max(0, Math.min(1, (p - a) / 0.16));
         r.style.opacity = String(t);
-        r.style.transform = `translate3d(${(1 - t) * -70}px, ${(1 - t) * 26}px, 0)`;
+        // mobil nur senkrecht (kein seitlicher Einflug)
+        r.style.transform = mobile ? `translate3d(0, ${(1 - t) * 30}px, 0)` : `translate3d(${(1 - t) * -70}px, ${(1 - t) * 26}px, 0)`;
       });
       const hs = Math.min(1, p * 8);
       head.style.opacity = String(hs);
@@ -505,8 +583,14 @@ function Finale() {
       if (hover < 0) setActive(Math.min(n - 1, Math.floor(Math.max(0, p - 0.1) * (n / 0.72))));
     };
     interReg["finale"] = upd;
+    const mm = gsap.matchMedia();
+    mm.add({ isMobile: MOBILE_MQ, isDesktop: DESKTOP_MQ }, (c) => {
+      mobile = !!c.conditions?.isMobile;
+      upd(lastP);
+    });
     upd(0);
     return () => {
+      mm.revert();
       delete interReg["finale"];
       rows.forEach((r, i) => {
         r.removeEventListener("pointerenter", enter[i]);
@@ -585,7 +669,7 @@ function Parlor() {
   return (
     <div ref={ref} className="il il-par">
       {SCENES.map((s) => (
-        <img key={s.img} className="pa-img" src={`/interlude/${s.img}.jpg`} alt={s.k} decoding="async" />
+        <img key={s.img} className="pa-img" src={IMG(s.img)} alt={s.k} decoding="async" />
       ))}
       <div className="pa-shade" />
       <div className="pa-lead"><p className="il-k">Die Eisdiele</p></div>
