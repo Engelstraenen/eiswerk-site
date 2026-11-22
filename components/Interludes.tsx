@@ -7,7 +7,7 @@ import { MENU_CATS } from "@/lib/dishes";
 import { asset } from "@/lib/asset";
 import { DESKTOP_MQ, MOBILE_MQ } from "@/lib/responsive";
 
-const IMG = (n: string) => `/interlude/${n}.jpg`;
+const IMG = (n: string) => asset(`/interlude/${n}.jpg`);
 
 function useScrub(id: InterId, build: (root: HTMLDivElement) => gsap.core.Timeline) {
   const ref = useRef<HTMLDivElement>(null);
@@ -669,7 +669,7 @@ function Parlor() {
   return (
     <div ref={ref} className="il il-par">
       {SCENES.map((s) => (
-        <img key={s.img} className="pa-img" src={`/interlude/${s.img}.jpg`} alt={s.k} decoding="async" />
+        <img key={s.img} className="pa-img" src={IMG(s.img)} alt={s.k} decoding="async" />
       ))}
       <div className="pa-shade" />
       <div className="pa-lead"><p className="il-k">Die Eisdiele</p></div>
